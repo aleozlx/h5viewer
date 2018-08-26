@@ -48,6 +48,7 @@ impl ToString for Query {
 
 #[derive(PartialEq, Eq, Hash, Clone)]
 pub struct H5URI {
+    pub host: String,
     pub path: String,
     pub h5path: String,
     pub query: Query,
@@ -84,7 +85,7 @@ impl H5Cache {
     }
 
     fn download(uri: &H5URI) -> Option<Vec<u8>> {
-        let mut stream = TcpStream::connect("localhost:8000").ok()?;
+        let mut stream = TcpStream::connect(&uri.host).ok()?;
         let mut buffer_in = Vec::with_capacity(8<<20);
         let mut buffer_out = Vec::with_capacity(20<<20);
         let _ = stream.write(uri.to_string().as_bytes());
@@ -106,7 +107,7 @@ impl H5Cache {
         Some(image::DynamicImage::ImageRgb8(image::ImageBuffer::from_raw(
             resolution.0, resolution.1,
             data.into_iter().map(|x| {
-                (x+100.0) as u8
+                (x*255.0) as u8
             }
         ).collect())?).to_rgba())
     }

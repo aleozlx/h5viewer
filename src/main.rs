@@ -15,6 +15,7 @@ mod h5meta;
 mod h5slice;
 use std::rc::Rc;
 use std::path::PathBuf;
+use std::env;
 use vgui::{SpritePrototype, MenuAdapter, VGUIFont};
 use h5meta::{H5Obj, H5Group, H5DatasetFormat};
 use h5slice::{H5URI, Dtype, H5Cache, Query};
@@ -116,8 +117,11 @@ fn main() {
     let mut menu = vgui::Menu::adapt(h5root.locate_group(&h5pointer).unwrap(), Rc::clone(&font));
     register_menu(&mut scene, &mut menu, &mut window.factory);
 
+    let args: Vec<String> = env::args().collect();
+    let hostname = if args.len() > 1 { &args[1] } else { "localhost" };
     let mut image_cache = H5Cache::new();
     let mut uri = H5URI {
+        host: format!("{}:8000", hostname),
         path: String::from("/home/alex/datasets/ucm-sample.h5"),
         h5path: String::from(""),
         query: Query::One(0),
